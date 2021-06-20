@@ -6,6 +6,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
 use App\Bookings\TimeSlotGenerator;
 use App\Models\Service;
+use App\Bookings\Filters\SlotsPassedTodayFilter;
 
 class BookingController extends Controller
 {
@@ -14,7 +15,11 @@ class BookingController extends Controller
         $schedule=Schedule::find(1);
         $service=Service::find(1);
         
-        $slots=(new TimeSlotGenerator($schedule,$service))->get();
+        $slots=(new TimeSlotGenerator($schedule,$service))
+        ->applyFilters([
+            new SlotsPassedTodayFilter()
+            ])
+        ->get();
         return view('bookings.create',[
             'slots'=>$slots
         ]);
